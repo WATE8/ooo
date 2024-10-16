@@ -3,7 +3,9 @@ package searchengine.controllers;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,15 +26,16 @@ public class DefaultController {
 
     private final AtomicBoolean isIndexingInProgress = new AtomicBoolean(false);
 
-    // Список сайтов для индексации
     private final List<String> sites = List.of(
             "https://example.com",
             "https://example.org",
             "https://example.net"
     );
 
-    // Создаем экземпляр HttpClient один раз
     private final HttpClient client = HttpClient.newHttpClient();
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @RequestMapping("/")
     public String index() {
@@ -56,7 +59,6 @@ public class DefaultController {
         }
     }
 
-    // Логика индексации сайтов
     private void performFullIndexing() {
         System.out.println("Запуск индексации сайтов...");
 
@@ -64,7 +66,6 @@ public class DefaultController {
             try {
                 System.out.println("Индексация сайта: " + site);
 
-                // Загрузка и обработка контента сайта
                 String content = fetchSiteContent(site);
                 processAndIndexContent(site, content);
 
@@ -77,23 +78,19 @@ public class DefaultController {
         System.out.println("Индексация всех сайтов завершена.");
     }
 
-    // Метод для скачивания контента сайта
     private String fetchSiteContent(String siteUrl) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(siteUrl))
                 .build();
 
-        // Выполняем синхронный HTTP-запрос
         HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (InterruptedException e) {
-            // Восстанавливаем статус прерывания
             Thread.currentThread().interrupt();
             throw new InterruptedException("Запрос был прерван при загрузке сайта: " + siteUrl);
         }
 
-        // Проверяем успешный статус
         if (response.statusCode() == 200) {
             return response.body();  // Возвращаем содержимое страницы
         } else {
@@ -101,7 +98,6 @@ public class DefaultController {
         }
     }
 
-    // Метод для обработки и индексации контента
     private void processAndIndexContent(String siteUrl, String content) {
         try {
             Document doc = Jsoup.parse(content);
@@ -112,10 +108,16 @@ public class DefaultController {
             System.out.println("Текст страницы:");
             paragraphs.forEach(paragraph -> System.out.println(paragraph.text()));
 
-            // Логика сохранения данных в базу может быть добавлена здесь
+            savePageToDatabase(siteUrl, title, content);
+
         } catch (Exception e) {
             System.err.println("Ошибка при обработке контента сайта: " + siteUrl + " - " + e.getMessage());
         }
+    }
+
+    private void savePageToDatabase(String siteUrl, String title, String content) {
+        String sql = "INSERT INTO pages (site_url, title, content) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, siteUrl, title, content); // Используем JdbcTemplate для сохранения
     }
 
     private Map<String, Object> createSuccessResponse() {
