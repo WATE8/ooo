@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+        <lucene-core.version>9.6.0</lucene-core.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
@@ -78,6 +79,14 @@
             <groupId>org.apache.lucene.morphology</groupId>
             <artifactId>morph</artifactId>
             <version>${morph.version}</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene.analysis</groupId>
