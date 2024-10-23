@@ -9,7 +9,6 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <lucene-core.version>9.6.0</lucene-core.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
@@ -20,6 +19,7 @@
         <english.version>1.5</english.version>
         <dictionary-reader.version>1.5</dictionary-reader.version>
         <russian.version>1.5</russian.version>
+        <lucene-analyzers-common.version>8.11.2</lucene-analyzers-common.version>
     </properties>
 
     <parent>
@@ -70,6 +70,11 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>${lucene-analyzers-common.version}</version> <!-- Проверьте последнюю версию -->
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version> <!-- Указание версии MySQL Connector -->
@@ -79,14 +84,6 @@
             <groupId>org.apache.lucene.morphology</groupId>
             <artifactId>morph</artifactId>
             <version>${morph.version}</version>
-        </dependency>
-
-
-
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>${lucene-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene.analysis</groupId>
